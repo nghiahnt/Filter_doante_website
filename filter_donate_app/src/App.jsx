@@ -1,12 +1,11 @@
-import BodyContent from "./components/BodyContent"
+import BodyContent from "./components/BodyContent";
 
 function App() {
-
   return (
     <>
       <BodyContent />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
