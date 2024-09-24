@@ -1,6 +1,42 @@
+/* eslint-disable no-prototype-builtins */
+import axios from "axios";
+import { useEffect, useState } from "react";
 import "./BodyContent.css";
 
 function BodyContent() {
+  const [data, setData] = useState([]);
+
+  // Hàm chuẩn hóa key
+  function normalizeKeys(obj) {
+    const normalizedObj = {};
+
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        // Làm sạch key
+        const cleanedKey = key
+          .replace(/[^a-zA-Z0-9_]/g, "") // Loại bỏ ký tự không hợp lệ
+          .toLowerCase() // Chuyển về chữ thường
+          .replace(/\s+/g, "_"); // Thay thế khoảng trắng bằng dấu gạch dưới
+
+        normalizedObj[cleanedKey] = obj[key]; // Gán giá trị cho key đã chuẩn hóa
+      }
+    }
+
+    return normalizedObj;
+  }
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/")
+      .then((res) => {
+        const normalizedData = res.data.data.map(normalizeKeys);
+        setData(normalizedData);
+      })
+      .catch((error) => console.error(error));
+  }, []);
+
+  data.length !== 0 && console.log(data);
+
   return (
     <div className="container">
       <div className="header">
@@ -39,20 +75,16 @@ function BodyContent() {
             </tr>
           </thead>
           <tbody className="result-data">
-            <tr>
-              <td>24/09/24</td>
-              <td>1</td>
-              <td>100</td>
-              <td>0</td>
-              <td>nghia ckhoan</td>
-            </tr>
-            <tr>
-              <td>24/09/24</td>
-              <td>1</td>
-              <td>100</td>
-              <td>0</td>
-              <td>nghia ckhoan</td>
-            </tr>
+            {data.length !== 0 &&
+              data.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.date_time.split("_")[0]}</td>
+                  <td className="textCenter">{item.trans_no}</td>
+                  <td>{item.credit}</td>
+                  <td className="textCenter">{item.debit}</td>
+                  <td>{item.detail}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
